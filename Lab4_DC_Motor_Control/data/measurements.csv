@@ -1,0 +1,9 @@
+experiment,pwm_value,nominal_duty_percent,motor_terminal_voltage_V,observation,notes
+PWM motor drive,64,25,0.364,barely rotating,DC multimeter reading during 3-second pulse
+PWM motor drive,128,50,1.74,moderate rotation,DC multimeter reading during 3-second pulse
+PWM motor drive,191,75,2.50,noticeably faster than 50 percent,DC multimeter reading during 3-second pulse
+PWM motor drive,255,100,3.39,normal rotation / fastest observed,DC multimeter reading during 3-second pulse from separate forward test
+Direction forward,255,100,3.39,motor rotated,D7 HIGH and D8 LOW
+Direction reverse,255,100,-3.39,motor rotated,D7 LOW and D8 HIGH
+Supply standby,,,5.00,motor disabled,VCC2 relative to common GND
+Supply under load,191,75,4.94,motor running,VCC2 relative to common GND during pulse
