@@ -2,11 +2,13 @@
 
 **Pre-Mechatronics — Lab 4** · ELEGOO UNO R3 starter kit · Hands-on laboratory and portfolio project
 
+**Status: Complete — electrical experiments and refactored controller hardware-validated.**
+
 ## Project overview
 
 Built and measured an Arduino-controlled brushed DC motor circuit using an L293D H-bridge and a separately regulated 5V supply. Demonstrated motor enable/disable, electronic direction reversal, and variable-speed PWM operation. Logged voltage measurements to compare commanded duty cycle with the DC multimeter's motor-terminal readings.
 
-**Demonstrated outcomes:** Motor rotated in both commanded directions; motor terminal polarity changed from **+3.39V** (forward) to **−3.39V** (reverse) without swapping motor leads. PWM increased apparent speed. The motor supply measured **5.00V at standby** and **4.94V** during a short **75% PWM** run.
+**Demonstrated outcomes:** Motor rotated in both commanded directions; motor terminal polarity changed from **+3.39V** (forward) to **−3.39V** (reverse) without swapping motor leads. PWM increased apparent speed. The motor supply measured **5.00V at standby** and **4.94V** during a short **75% PWM** run. A subsequent serial-controlled sketch was validated on the assembled circuit for forward/reverse operation, PWM selection, timed shutdown, and commanded stopping.
 
 ## Hardware
 
@@ -69,30 +71,67 @@ This short test indicates reasonably stable measured supply voltage *during the 
 
 Raw entries are provided in [`data/measurements.csv`](data/measurements.csv).
 
-## Portfolio sketch (new, not yet hardware-tested)
+## Portfolio sketch (hardware-validated)
 
 Source: [`arduino/Lab4_DC_Motor_Control/Lab4_DC_Motor_Control.ino`](arduino/Lab4_DC_Motor_Control/Lab4_DC_Motor_Control.ino).
 
-The portfolio version replaces repeated edits and uploads with explicit commands using Arduino IDE **Serial Monitor at 115200 baud**. The motor **never starts automatically on reset**. Set the direction and duty, then send `g` to start one *maximum three-second* pulse. Send `s` to stop during the pulse. Changing speed or direction is disabled while the motor is running.
+The refactored portfolio sketch replaces repeated edits and uploads with explicit commands using the Arduino IDE **Serial Monitor at 115200 baud**. The motor **does not start automatically on reset**. Set the direction and duty, then send `g` to start one *maximum three-second* pulse. Send `s` to stop during the pulse. The sketch is designed to prevent speed and direction changes while the motor is running.
 
 | Serial command | Action |
 |---|---|
 | `f` / `r` | Select forward or reverse |
 | `1` / `2` / `3` / `4` | Select ~25% / ~50% / ~75% / 100% duty |
 | `g` | Start one timed pulse (max 3 seconds) |
-| `s` | Stop immediately in software |
+| `s` | Stop the motor in software |
 | `?` | Help and current status |
 
-**Important:** This refactored sketch is a *next-stage implementation*, not the exact code that generated the measurements above. Compile and validate it separately before claiming its operation as a tested outcome. Software stop and the three-second timeout are **not emergency-stop safety hardware**. Use the power switch/disconnect as the physical means of de-energizing the motor, and keep the test setup secured.
+**Code provenance:** This refactored sketch was tested *after* the electrical measurements above; it is not the exact sketch used to collect those measurements. The software stop and three-second timeout are **not safety-rated emergency-stop mechanisms**. The power switch/disconnect is the physical means of de-energizing the motor.
 
-### Suggested validation procedure
+### Hardware validation results
 
-1. Disconnect both supplies. Disconnect Arduino D7, D8, D9 from the unpowered L293D before uploading; leave their breadboard ends installed.
-2. Upload the new sketch from the Arduino IDE with the driver supply disconnected, then remove USB.
-3. Restore D7/D8/D9 with power off; verify all grounds and motor connections.
-4. Reconnect Arduino USB; open Serial Monitor at 115200 and confirm the motor stays off at startup.
-5. Power on the separate 5V motor supply, confirm standby. Select direction and duty; issue `g` once. Observe the motor and verify it disables within three seconds; test `s` separately.
-6. Power down and disconnect the circuit before moving measurement leads or rewiring.
+The revised sketch was compiled, uploaded, and exercised with the Arduino Uno, L293D driver, and motor connected. The following observations were recorded through the Arduino IDE Serial Monitor and direct observation of the motor:
+
+| Test | Observed behavior | Result |
+|---|---|---|
+| Safe startup | Motor remained stationary after reset and after external motor supply was switched ON | Passed |
+| PWM selection | `1` selected `64/255` (~25%); `3` selected `191/255` (~75%) without starting the motor | Passed |
+| Direction selection | `r` and `f` updated direction while motor remained stopped | Passed |
+| Stop command, idle | `s` returned `STOP command: motor disabled.` | Passed |
+| Reverse pulse at 25% | Motor rotated slightly; pulse ended automatically after approximately three seconds | Passed |
+| Reverse pulse at 75% | Motor ran; `s` interrupted the pulse before its three-second timeout | Passed |
+| Forward pulse at 75% | Motor rotated opposite to reverse; stopped automatically after approximately three seconds | Passed |
+| Serial status output | RUNNING, STOPPED, start, stop, and pulse-finished messages were observed during tests | Passed |
+
+**Example forward test (75% PWM):**
+
+```text
+Motor pulse started (max 3 seconds).
+Direction: forward | PWM: 191/255 | Motor: RUNNING
+Pulse finished; motor disabled.
+```
+
+**Example commanded stop (75% PWM, reverse):**
+
+```text
+Motor pulse started (max 3 seconds).
+Direction: reverse | PWM: 191/255 | Motor: RUNNING
+STOP command: motor disabled.
+```
+
+### Controller conclusions and limits
+
+The validated controller independently accepted direction and duty-cycle selections, performed short commanded motor runs, automatically disabled output after its timer expired, and accepted a stop command during an active pulse. This demonstrates basic serial command processing, discrete control states, PWM-based actuation, and timed operation.
+
+The validation was **functional, not exhaustive**. It did not measure exact stop latency, PWM waveform shape, motor RPM, motor current, or fault behavior under all operating conditions. The initial Serial Monitor output included a brief sequence of garbled characters and `Unknown command` messages before the readable startup menu; subsequent commands worked normally. This startup anomaly remains available for future troubleshooting.
+
+### Safe operation and test procedure
+
+1. With USB and external power disconnected, inspect wiring, motor clearance, and common ground. Keep motor power OFF while uploading.
+2. Upload the sketch to the Uno and open Serial Monitor at **115200 baud**. Confirm the motor is stopped on startup.
+3. Switch ON the separate motor supply and verify the motor remains stationary.
+4. Select direction (`f` or `r`) and duty (`1`–`4`) while stopped. Send `g` to start one pulse; observe automatic three-second shutdown.
+5. In a separate pulse, send `s` while the motor is running to verify commanded stopping. For abnormal behavior, use the **physical supply switch/disconnect**, not the serial command.
+6. Switch OFF the module and disconnect its adapter and Arduino USB before rewiring or changing measurement connections.
 
 ## Troubleshooting and engineering lessons
 
@@ -104,7 +143,6 @@ The portfolio version replaces repeated edits and uploads with explicit commands
 
 ## Next improvements
 
-- Validate the new serial-controlled sketch on the assembled circuit.
 - Measure actual motor speed with an optical or encoder-based method; compare RPM vs. duty cycle.
 - Measure motor current safely with a suitable measurement method and characterize loaded voltage at multiple duty cycles.
 - Add a labeled photograph of the finished circuit and a fully verified breadboard diagram.
