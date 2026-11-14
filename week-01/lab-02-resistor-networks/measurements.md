@@ -63,14 +63,14 @@ Arduino 5V
 
 ### Breadboard Connections
 
-| Component | Start | End |
-|---|---|---|
-| R1 | H50 | H54 |
-| R2 | F54 | F58 |
-| R3 | E54 | E58 |
-| Node A jumper | G54 | D54 |
-| Ground jumper | H58 | D58 |
-| Supply jumper | Arduino 5V | J50 |
+| Component     | Start       | End |
+|---------------|-------------|-----|
+| R1            | H50         | H54 |
+| R2            | F54         | F58 |
+| R3            | E54         | E58 |
+| Node A jumper | G54         | D54 |
+| Ground jumper | H58         | D58 |
+| Supply jumper | Arduino 5V  | J50 |
 | Ground jumper | Arduino GND | J58 |
 
 The existing DC motor-control circuit remained unpowered and electrically isolated.
@@ -504,12 +504,12 @@ P=I^2R
 
 Theoretical component-power estimates:
 
-| Component | Predicted power |
-|---|---:|
-| R1 | Approximately 19.83 mW |
-| R2 | Approximately 16.88 mW |
-| R3 | Approximately 5.58 mW |
-| Total | Approximately 42.29 mW |
+| Component | Predicted power        |
+| --------- | ---------------------- |
+| R1        | Approximately 19.83 mW |
+| R2        | Approximately 16.88 mW |
+| R3        | Approximately 5.58 mW  |
+| Total     | Approximately 42.29 mW |
 
 ### Source power
 
@@ -601,19 +601,19 @@ The measurements are consistent with power conservation, but the numerical agree
 
 ## 15. Summary of Experimental Results
 
-| Verification | Experimental result |
-|---|---|
-| Equivalent resistance | 0.195% difference |
-| R1 voltage drop | Close agreement with prediction |
-| R2 voltage drop | Close agreement with prediction |
-| R3 voltage drop | Close agreement with prediction |
-| KVL Loop 1 | -10 mV residual |
-| KVL Loop 2 | -8 mV residual |
-| Total current | Approximately 1.42% difference |
-| R2 current | Approximately 1.86% difference |
-| R3 current | Approximately 1.34% difference |
-| KCL at Node A | 0.319% imbalance |
-| Power conservation | Consistent within experimental limitations |
+| Verification          | Experimental result                        |
+| --------------------- | ------------------------------------------ |
+| Equivalent resistance | 0.195% difference                          |
+| R1 voltage drop       | Close agreement with prediction            |
+| R2 voltage drop       | Close agreement with prediction            |
+| R3 voltage drop       | Close agreement with prediction            |
+| KVL Loop 1            | -10 mV residual                            |
+| KVL Loop 2            | -8 mV residual                             |
+| Total current         | Approximately 1.42% difference             |
+| R2 current            | Approximately 1.86% difference             |
+| R3 current            | Approximately 1.34% difference             |
+| KCL at Node A         | 0.319% imbalance                           |
+| Power conservation    | Consistent within experimental limitations |
 
 ---
 
@@ -621,7 +621,7 @@ The measurements are consistent with power conservation, but the numerical agree
 
 1. The actual Arduino supply voltage was lower than the nominal 5.00 V value used for the initial predictions.
 
-2. The measured voltage at Arduino 5V was 4.460 V, while the measured input voltage at breadboard J50 was 4.430 V.
+2. The measured voltage at Arduino 5V was 4.460 V, while the measured input voltage at breadboard I50 was 4.430 V.
 
 3. Recalculating theoretical values using the measured breadboard supply voltage improved agreement with the experimental results.
 
